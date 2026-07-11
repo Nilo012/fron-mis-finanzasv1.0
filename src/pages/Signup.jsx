@@ -8,6 +8,8 @@ import axiosConfig from "../util/axiosConfig";
 import { API_ENDPOINTS } from "../util/apiEndpoints";
 import toast from "react-hot-toast";
 import { LoaderCircle } from "lucide-react";
+import ProfilePhotoSelector from "../components/ProfilePhotoSelector";
+import uploadProfileImage from "../util/uploadProfileImage";
 
 const Signup = () => {
   const [fullName, setFullName] = useState("");
@@ -15,10 +17,15 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  //imagen de perfil
+  const [profilePhoto, setProfilePhoto] = useState(null);
 
   const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    //debe ser igual ala variable q esta en entity
+    let profileImagenUrl = "";
     setIsLoading(true);
 
     //validaciones
@@ -43,10 +50,20 @@ const Signup = () => {
 
     //signup api
     try {
+      //subir foto
+      if (profilePhoto) {
+        console.log("Archivo:", profilePhoto);
+
+        const imageUrl = await uploadProfileImage(profilePhoto);
+        profileImagenUrl = imageUrl || "";
+        console.log("URL Cloudinary:", imageUrl);
+      }
+      
       const response = await axiosConfig.post(API_ENDPOINTS.REGISTER, {
         fullName,
         email,
         password,
+        profileImagenUrl
       });
       if (response.status === 201) {
         toast.success("Registro exitoso");
@@ -77,7 +94,12 @@ const Signup = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex justify-center mb-6"></div>
+            <div className="flex justify-center mb-6">
+              <ProfilePhotoSelector
+                image={profilePhoto}
+                setImage={setProfilePhoto}
+              />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
               <Input
                 value={fullName}
