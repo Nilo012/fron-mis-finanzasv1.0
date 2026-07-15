@@ -9,7 +9,7 @@ import { Menu } from "lucide-react";
 import { assets } from "../assets/assets";
 import { User } from "lucide-react";
 import { LogOut } from "lucide-react";
-import { Sidebar } from "lucide-react";
+import Sidebar from "./Sidebar";
 import { useEffect } from "react";
 
 const Menubar = ({activeMenu}) => {

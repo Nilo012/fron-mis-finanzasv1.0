@@ -2,6 +2,7 @@ import { Categories } from "emoji-picker-react";
 import Input from "../components/Input";
 import { useState } from "react";
 import EmojiPickerP from "../components/EmojiPickerP";
+import { useEffect } from "react";
 
 const AddIncomeForm = ({ onAddIncome, categories }) => {
   const [income, setIncome] = useState({
@@ -11,7 +12,7 @@ const AddIncomeForm = ({ onAddIncome, categories }) => {
     icon: "",
     categoryId: "",
   });
-  const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false);
   const categoryOptions = categories.map((category) => ({
     value: category.id,
     label: category.name,
@@ -20,6 +21,26 @@ const AddIncomeForm = ({ onAddIncome, categories }) => {
   const handleChange = (key, value) => {
     setIncome({ ...income, [key]: value });
   };
+
+  const handleAddIncome = async () => {
+    setLoading(false);
+    try {
+      await onAddIncome(income);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Asegura que existan categorías disponibles y que el usuario 
+  // no haya seleccionado una categoría previamente para evitar sobrescribir.
+  useEffect(()=>{
+    // Establece la primera categoría de la lista como valor por defecto
+    // para inicializar el formulario con una opción válida.
+    if (categories.length > 0 && !income.categoryId) {
+      setIncome((prev)=>({...prev,categoryId:categories[0].id}))
+    }
+  },[categories,income.categoryId])// Se ejecuta al cargar o actualizar 
+
   return (
     <div>
       <EmojiPickerP
@@ -60,20 +81,23 @@ const AddIncomeForm = ({ onAddIncome, categories }) => {
       />
       <div className="flex justify-end mt-6">
         <button
-        //   type="button"
-           onClick={()=>onAddIncome(income)}
-        //   disabled={loading}
+          //   type="button"
+          onClick={handleAddIncome}
+          disabled={loading}
+          
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
         >
-          {/* {loading ? (
+          {loading ? (
             <>
               <LoaderCircle className="w-4 h-4 animate-spin" />
-              {isEditing ? "Actualizando...": "Agregando..."}
+              Agregando...
             </>
           ) : (
-            <>{isEditing ? "Actualizar Categoría": "Agregar Categoría"}</>
-          )} */}
-          Agregar Ingreso
+            <>
+            Agregar Ingreso
+            </>
+          )} 
+         
         </button>
       </div>
     </div>
