@@ -8,3 +8,14 @@ body{
 
 
 }
+/* Esto elimina el borde de foco azul/negro en cualquier elemento SVG o sus hijos */
+svg:focus,
+svg *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Esto elimina el efecto de resaltado al tocar en pantallas móviles */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+}

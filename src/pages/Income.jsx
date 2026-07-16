@@ -11,6 +11,7 @@ import Modal from "../components/Modal";
 import { Plus, TriangleAlert } from "lucide-react";
 import AddIncomeForm from "../components/AddIncomeForm";
 import DeleteAlert from "../components/DeleteAlert";
+import IncomeOverview from "../components/IncomeOverview";
 const Income = () => {
   useUser();
 
@@ -134,15 +135,11 @@ const Income = () => {
       <Dashboard activeMenu="Ingresos">
         <div className="my-5 mx-auto">
           <div className="grid grid-cols-1 gap-6">
+
             <div className="">
-              {/* descripcion para ingresos */}
-              <button
-                onClick={() => setOpenAddIncomeModal(true)}
-                className="flex items-center gap-2 bg-green-100 text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-green-200 transition-colors"
-              >
-                <Plus size={15} className="text-lg" />
-                Agregar Ingreso
-              </button>
+              {/* Resumen de ingresos con gráfico de línea (line char) */}
+              
+              <IncomeOverview transactions={incomeData} onAddIncome={()=> setOpenAddIncomeModal(true)}/>
             </div>
 
             <IncomeList
