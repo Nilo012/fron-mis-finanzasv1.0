@@ -125,6 +125,51 @@ const Income = () => {
     }
   };
 
+  // descargar data de ingresos
+  const handleDownloadIncomeDetails = async () => {
+    //console.log("descargar detalle de ingresos");
+    try {
+      const response = await axiosConfig.get(
+        API_ENDPOINTS.INCOME_EXCEL_DOWNLOAD,
+        { responseType: "blob" },
+      );
+      let filename = "detalle_ingresos.xlsx";
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Se desacargo el reporte de tus ingresos del mes");
+    } catch (error) {
+      console.error("No se pudo descargar el reporte de ingresos: ", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Ocurrió un error al generar el archivo. Por favor, intenta de nuevo.",
+      );
+    }
+  };
+
+  // enviar detalle de ingresos a email
+  const handleEmailIncomeDetails = async () => {
+    //console.log("enviar email reporte de ingresos ");
+
+    try {
+      const response = await axiosConfig.get(API_ENDPOINTS.EMAIL_INCOME);
+      if (response.status === 200) {
+        toast.success("Se envió el reporte de tus ingresos del mes");
+      }
+    } catch (error) {
+      console.error("No se pudo enviar el reporte de ingresos: ", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Ocurrió un error al enviar el correo. Por favor, intenta de nuevo.",
+      );
+    }
+  };
+
   useEffect(() => {
     fetchIncomeDetail();
     //
@@ -135,17 +180,21 @@ const Income = () => {
       <Dashboard activeMenu="Ingresos">
         <div className="my-5 mx-auto">
           <div className="grid grid-cols-1 gap-6">
-
             <div className="">
               {/* Resumen de ingresos con gráfico de línea (line char) */}
-              
-              <IncomeOverview transactions={incomeData} onAddIncome={()=> setOpenAddIncomeModal(true)}/>
+
+              <IncomeOverview
+                transactions={incomeData}
+                onAddIncome={() => setOpenAddIncomeModal(true)}
+              />
             </div>
 
             <IncomeList
               transactions={incomeData}
               // onDelete={(id) => console.log("eliminando ingreso", id)}
               onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
+              onDownload={handleDownloadIncomeDetails}
+              onEmail={handleEmailIncomeDetails}
             />
             {/* agrgar modal ingresos */}
             <Modal

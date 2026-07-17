@@ -3,7 +3,7 @@ import { Pencil } from "lucide-react";
 
 const CategoryList = ({ categories, onEditCategory }) => {
   return (
-    <div className="card p-4">
+    <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h4 className="text-lg font-semibold">Categorias Registradas</h4>
       </div>
