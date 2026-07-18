@@ -40,68 +40,92 @@ const Category = () => {
     fetchCantegoryDetails();
   }, []);
 
+
+
   const handleAddCategory = async (category) => {
     //console.log('Categoría Agregada', category)
     const { name, type, icon } = category;
     if (!name.trim()) {
-      toast.error("ingresa el Nombre de Categoría");
+      toast.error("Ingresa el Nombre de Categoría");
       return;
     }
     //VERIFICAR SI LA CATEGORIA YA EXISTE
     const isDuplicate = categoryData.some((category) => {
-      return category.name.toLowerCase() === name.trim().toLowerCase();
+      return (
+        category.name.toLowerCase() === name.trim().toLowerCase() &&
+        category.type === type
+      );
     });
     if (isDuplicate) {
-      toast.error("Nombre de Categoría ya existe");
+      toast.error("Ya existe una categoría con ese nombre para este tipo.");
       return;
     }
 
     try {
       const response = await axiosConfig.post(API_ENDPOINTS.ADD_CATEGORY, {
-        name,
+        name: name.trim(),
         type,
         icon,
       });
       if (response.status === 201) {
-        toast.success("Categoría Agregada");
+        toast.success("Categoría agregada correctamente");
         setOpenAddCategoryModal(false);
         fetchCantegoryDetails();
       }
     } catch (error) {
       console.error("Error al agregar categoría", error);
-      isDuplicate();
+      //isDuplicate();
     }
   };
+
+
 
   //editar categoria
   const handleEditCategory = (categoryToEdit) => {
     //console.log("Editando categoria", categoryToEdit);
-    setSelectedCategory(categoryToEdit)
-    setOpenEditCategoryModal(true)
+    setSelectedCategory(categoryToEdit);
+    setOpenEditCategoryModal(true);
   };
 
-  const handleUpdateCategory =async(updateCategory)=>{
+  const handleUpdateCategory = async (updateCategory) => {
     //console.log("Actualizando categoría",updateCategory);
-    const {id,name,type,icon}=updateCategory;
+    const { id, name, type, icon } = updateCategory;
     if (!name.trim()) {
-      toast.error("Registra el nombre de categoría")
+      toast.error("El nombre de la categoría es obligatorio.");
       return;
     }
-    if (!id) {
-      toast.error("id el nombre de categoría")
+
+    // 2. Verificar duplicados excluyendo el ID actual
+    const isDuplicate = categoryData.some(
+      (cat) =>
+        cat.name.trim().toLowerCase() === name.trim().toLowerCase() &&
+        cat.type === type &&
+        cat.id !== id, // <--- CLAVE: Ignorar la categoría que estoy editando
+    );
+
+    if (isDuplicate) {
+      toast.error("Ya existe otra categoría con este nombre y tipo.");
       return;
     }
+
     try {
-      await axiosConfig.put(API_ENDPOINTS.UPDATE_CATEGORY(id),{name,type,icon})
-      setOpenEditCategoryModal(false)
-      setSelectedCategory(null)
-      toast.success("Se actualizo la categoría con éxito")
-      fetchCantegoryDetails()
+      await axiosConfig.put(API_ENDPOINTS.UPDATE_CATEGORY(id), {
+        name:name.trim(),
+        type,
+        icon,
+      });
+      setOpenEditCategoryModal(false);
+      setSelectedCategory(null);
+      toast.success("Se actualizo la categoría con éxito");
+      fetchCantegoryDetails();
     } catch (error) {
-      console.log("Error ala actualizar categoría.", error.response?.data?.message || error.message)
-     toast.error( error.response?.data?.message || "No se pudo actualizar")
+      console.log(
+        "Error ala actualizar categoría.",
+        error.response?.data?.message || error.message,
+      );
+      toast.error(error.response?.data?.message || "No se pudo actualizar");
     }
-  }
+  };
 
   return (
     <div>
@@ -135,20 +159,19 @@ const Category = () => {
             <AddCategoryForm onAddCategory={handleAddCategory} />
           </Modal>
 
-
           {/* Atualizar modal categoria */}
           <Modal
-          onClose={()=>{
-            setOpenEditCategoryModal(false)
-            setSelectedCategory(null)
-          }}
-          isOpen={openEditCategoryModal}
-          title={"Actualizar Categoría"}
+            onClose={() => {
+              setOpenEditCategoryModal(false);
+              setSelectedCategory(null);
+            }}
+            isOpen={openEditCategoryModal}
+            title={"Actualizar Categoría"}
           >
-            <AddCategoryForm 
-            initialCategoryData={selectedCategory}
-            onAddCategory={handleUpdateCategory}
-            isEditing={true}
+            <AddCategoryForm
+              initialCategoryData={selectedCategory}
+              onAddCategory={handleUpdateCategory}
+              isEditing={true}
             />
           </Modal>
         </div>
