@@ -17,5 +17,6 @@ export const API_ENDPOINTS={
     INCOME_EXCEL_DOWNLOAD: "/excel/download/income",
     EMAIL_INCOME: "/email/income-excel",
     APPLY_FILTERS:"/filter",
+    DASHBOAARD_DATA: "/dashboard",
     UPLOAD_IMAGE: `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`
 }
